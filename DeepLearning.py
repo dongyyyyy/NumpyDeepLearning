@@ -49,6 +49,10 @@ if __name__ == "__main__":
     print(z1)
     print(z1.shape)
     v_sigmoid = V_Sigmoid()
+    h1 = np.array(np.zeros(10))
+    h2 = np.array(np.zeros(10))
+    h3 = np.array(np.zeros(10))
+    h4 = np.array(np.zeros(10))
     def forward(x,y):
         z1 = np.dot(x,W1)
         h1 = v_sigmoid(z1)
@@ -56,27 +60,38 @@ if __name__ == "__main__":
         h2 = v_sigmoid(z2)
         z3 = np.dot(h2,W3)
         h3 = v_sigmoid(z3)
+        print("h3",h3.shape)
         z4 = np.dot(h3,W4)
+        print("W4 : ", W4)
+        print("z4 : ",z4)
         h4 = v_sigmoid(z4)
         z5 = np.dot(h4,W5)
+        print("z5 : ",z5)
+        print("h4 : ",h4)
+        print("W5 : ",W5)
         o = v_sigmoid(z5)
         print(o.shape)
         print("="*20)
         print(y)
         print("=" * 20)
-        print(o)
+        print("o : ",o)
         print("=" * 20)
         print(y-o)
         e = np.sum(np.square(y - o))/2
         print("=" * 20)
-        print(e)
+        print("e: ",e)
         return e , o
 
     def backward(x,y):
-        sig5 = x(1-x)
-        w5 = (y-x)
+        print(x)
+        sig5 = x*(1-x) # f`(x)
+        print(sig5)
+        w5 = (y-x)*sig5 # 국부적 기울기
+        print("w5:",w5)
+        print("h4:",h4)
+        W5 = (-learning_rate)*w5*h4
 
-    forward(train_x_data[0], train_y_data_onehot[0])
-
+    Eav, error = forward(train_x_data[0], train_y_data_onehot[0])
+    backward(error,train_y_data_onehot[0])
 
 
