@@ -80,18 +80,19 @@ if __name__ == "__main__":
         e = np.sum(np.square(y - o))/2
         print("=" * 20)
         print("e: ",e)
-        return e , o
+        return e , o,h1,h2,h3,h4,z1,z2,z3,z4,z5
 
-    def backward(x,y):
+    def backward(x,y,W1,W2,W3,W4,W5,z1,z2,z3,z4,z5):
         print(x)
-        sig5 = x*(1-x) # f`(x)
-        print(sig5)
-        w5 = (y-x)*sig5 # 국부적 기울기
-        print("w5:",w5)
-        print("h4:",h4)
-        W5 = (-learning_rate)*w5*h4
+        sig5 = x*(1-x)
+        w5 = (y-x)*sig5 # 국부적 기울기 e(n)*f`(x) = e(n)*o(n)[1-o(n)]
+        #w5 = 각 출력 노드에서의 지역 기울기
+        #h4 = 각 노드의 출력 값
+        o_error = (-learning_rate)*np.matmul(w5, z5)   # h4 = h(l-1) , w5 = f'(z(n)) gl(n)
+        new_W5 = W5 + o_error
+        sig4 = x*(1-x)*o_error
 
-    Eav, error = forward(train_x_data[0], train_y_data_onehot[0])
-    backward(error,train_y_data_onehot[0])
 
+    Eav, error, h1,h2,h3,h4,z1,z2,z3,z4,z5 = forward(train_x_data[0],train_y_data[0])
+    backward(error,train_y_data_onehot[0],W1,W2,W3,W4,W5,z1,z2,z3,z4,z5)
 
