@@ -1,7 +1,7 @@
 import numpy as np
 from math import exp
-
-learning_rate = 0.001
+from DeepLearningFunction import *
+learning_rate = 0.01
 
 def V_Sigmoid():
     sigmoid = np.vectorize(Sigmoid)
@@ -13,6 +13,10 @@ def ReLU(x):
     return max(0,x)
 
 if __name__ == "__main__":
+
+    batch = 100
+    epoch = 10
+    startNumber = 0
 
     data = np.loadtxt('TrainDataset.csv',delimiter=',',dtype=np.float32)
     train_x_data = data[:,0:-1]
@@ -56,43 +60,78 @@ if __name__ == "__main__":
     def forward(x,y):
         z1 = np.dot(x,W1)
         h1 = v_sigmoid(z1)
+
         z2 = np.dot(h1,W2)
         h2 = v_sigmoid(z2)
+
         z3 = np.dot(h2,W3)
         h3 = v_sigmoid(z3)
-        print("h3",h3.shape)
+
         z4 = np.dot(h3,W4)
-        print("W4 : ", W4)
-        print("z4 : ",z4)
         h4 = v_sigmoid(z4)
+
         z5 = np.dot(h4,W5)
-        print("z5 : ",z5)
-        print("h4 : ",h4)
-        print("W5 : ",W5)
         o = v_sigmoid(z5)
+        print("o shape : ", o.shape)
+        e = np.sum(np.square(y - o))/2
+        '''
         print(o.shape)
         print("="*20)
         print(y)
         print("=" * 20)
         print("o : ",o)
         print("=" * 20)
-        print(y-o)
-        e = np.sum(np.square(y - o))/2
+        print("y : ",y)
+        print("=" * 20)
+        print("y-o : ",y-o)
         print("=" * 20)
         print("e: ",e)
+        '''
         return e , o,h1,h2,h3,h4,z1,z2,z3,z4,z5
 
-    def backward(x,y,W1,W2,W3,W4,W5,z1,z2,z3,z4,z5):
-        print(x)
+    def backward(x,y,W1,W2,W3,W4,W5,input_data,h1,h2,h3,h4):
         sig5 = x*(1-x)
-        w5 = (y-x)*sig5 # 국부적 기울기 e(n)*f`(x) = e(n)*o(n)[1-o(n)]
-        #w5 = 각 출력 노드에서의 지역 기울기
-        #h4 = 각 노드의 출력 값
-        o_error = (-learning_rate)*np.matmul(w5, z5)   # h4 = h(l-1) , w5 = f'(z(n)) gl(n)
-        new_W5 = W5 + o_error
-        sig4 = x*(1-x)*o_error
+        local_param5 = (y-x)*sig5 # 국부적 기울기 e(n)*f`(x) = e(n)*o(n)[1-o(n)] 출력노드의 국부적 기울기
+        #local_param5 = 각 출력 노드에서의 지역 기울기 8
+        #h4 = 각 노드의 출력 값 10
+        print(local_param5.shape)
+        print(h4.shape)
+        result = HandFunction(h4,local_param5,batch)
+        delta_o = (-learning_rate)*result   # h4 = h(l-1) , w5 = f'(z(n)) gl(n)
+        W5 = W5 + delta_o # 새로운 W5값 W(n+1) = W(n) + delta_W(n)
 
+        local_param4 = (h4)*(1-h4)
+        result = HandFunction(h3,local_param4,batch)
+        delta_h4 = (-learning_rate)*result
+        W4 = W4 + delta_h4
 
-    Eav, error, h1,h2,h3,h4,z1,z2,z3,z4,z5 = forward(train_x_data[0],train_y_data[0])
-    backward(error,train_y_data_onehot[0],W1,W2,W3,W4,W5,z1,z2,z3,z4,z5)
+        local_param3 = (h3)*(1-h3)
+        result = HandFunction(h2,local_param3,batch)
+        delta_h3 = (-learning_rate)*result
+        W3 = W3 + delta_h3
 
+        local_param2 = (h2)*(1-h2)
+        result = HandFunction(h1,local_param2,batch)
+        delta_h2 = (-learning_rate)*result
+        W2 = W2 + delta_h2
+
+        local_param1 = (h1)*(1-h1)
+        result = HandFunction(input_data,local_param1,batch)
+        delta_h1 = (-learning_rate)*result
+        W1 = W1 + delta_h1
+
+        return W1,W2,W3,W4,W5
+
+    maxBatch = int(len(train_x_data)/batch)
+    print("batch size   = ", batch)
+    print("batch Number = ", maxBatch)
+
+    for i in range(epoch): # 10 번 반복
+        for j in range(maxBatch): # 200번 반복
+            x_batch = train_x_data[startNumber:startNumber+100]
+            y_batch = train_y_data_onehot[startNumber:startNumber+100]
+            Eav, error, h1,h2,h3,h4,z1,z2,z3,z4,z5 = forward(x_batch,y_batch)
+            print("Eav : ",Eav)
+            W1,W2,W3,W4,W5 =backward(error,y_batch,W1,W2,W3,W4,W5,x_batch,h1,h2,h3,h4)
+            #print(W1)
+            startNumber = startNumber + 100
