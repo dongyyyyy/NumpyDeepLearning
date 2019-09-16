@@ -23,6 +23,12 @@ def HandFunction2(h,f,batch):
             result[j][i] = h[j] * f[j][i] # 100, ( 100,96 ) 192 , (96,192)
     return result
 
+def ODivideFunction(h,f):
+    result = np.array(np.zeros([len(h), len(h[0])]))
+    for i in range(len(h)): # 100
+        for j in range(len(h[0])): # 8
+            result[i][j] = h[i][j] / f[i]
+    return result
 
 def MakeFristOne(h):
     for i in range(len(h)):
