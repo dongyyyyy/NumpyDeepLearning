@@ -1,6 +1,6 @@
 import numpy as np
 
-def HandFunction(h,f,batch):
+def HandFunction(h,f):
     result = np.array(np.zeros([len(h[0]), len(f[0])]))
     h = h.sum(axis=0)
     f = f.sum(axis=0)
@@ -9,19 +9,20 @@ def HandFunction(h,f,batch):
             result[i][j] = h[i] * f[j]
     return result
 
-def HandFunction1(h,f,batch):
+def HandFunction1(h,f):
     result = np.array(np.zeros([len(f),len(f[0])]))
-    for i in range(len(f)):
-        for j in range(len(f[0])):
-            result[i][j] = h[j] * f[i][j] # 100, ( 100,96 ) 192 , (96,192)
+    for i in range(len(f)): # 100
+        for j in range(len(f[0])): # 24
+            result[i][j] = h[j] * f[i][j] # 24 , (100,24) -> (100,24)
     return result
 
-def HandFunction2(h,f,batch):
+def HandFunction2(h,f):
     result = np.array(np.zeros([len(h),len(f[0])]))
-    for i in range(len(f[0])):
-        for j in range(len(h)):
-            result[j][i] = h[j] * f[j][i] # 100, ( 100,96 ) 192 , (96,192)
+    for i in range(len(f[0])): # 24
+        for j in range(len(h)): # 100
+            result[j][i] = h[j] * f[j][i] # (100) , (100,24) -> (100,24)
     return result
+
 
 def ODivideFunction(h,f):
     result = np.array(np.zeros([len(h), len(h[0])]))

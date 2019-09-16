@@ -106,30 +106,30 @@ if __name__ == "__main__":
         local_param4 = (x - y)
         # sig8 = x*(1-x)
         # local_param8 = (y-x)*sig8 # 출력노드 국부적기울기
-        result = HandFunction(h3, local_param4, batch)
+        result = HandFunction(h3, local_param4)
         delta_o = (-learning_rate) * result
         NW4 = W4 + delta_o
 
         sig3 = (h3) * (1 - h3)
-        local_param3 = HandFunction2(np.sum(local_param4, axis=1), sig3, batch)  # (100,8) , (100, 96)
-        local_param3 = HandFunction1(np.sum(W4, axis=1), local_param3, batch)  # (96 , 1) , ( 100, 96 ) -> ( 100, 96 )
-        result = HandFunction(h2, local_param3, batch)  # h6 = (100,192) local_param7 = (100,96)
+        local_param3 = HandFunction2(np.sum(local_param4, axis=1), sig3)  # (100,8) , (100, 96)
+        local_param3 = HandFunction1(np.sum(W4, axis=1), local_param3)  # (96 , 1) , ( 100, 96 ) -> ( 100, 96 )
+        result = HandFunction(h2, local_param3)  # h6 = (100,192) local_param7 = (100,96)
         delta_h3 = (-learning_rate) * result
         NW3 = W3 + delta_h3
 
         # (192,96)
         sig2 = (h2) * (1 - h2)
-        local_param2 = HandFunction2(np.sum(local_param3, axis=1), sig2, batch)  # (100, 96) , (100,192) -> (192, 96)
-        local_param2 = HandFunction1(np.sum(W3, axis=1), local_param2, batch)  #
-        result = HandFunction(h1, local_param2, batch)  # 100,192 / 100 , 96
+        local_param2 = HandFunction2(np.sum(local_param3, axis=1), sig2)  # (100, 96) , (100,192) -> (192, 96)
+        local_param2 = HandFunction1(np.sum(W3, axis=1), local_param2)  #
+        result = HandFunction(h1, local_param2)  # 100,192 / 100 , 96
         delta_h2 = (-learning_rate) * result  # h4 = h(l-1) , w5 = f'(z(n)) gl(n)
         NW2 = W2 + delta_h2  # 새로운 W5값 W(n+1) = W(n) + delta_W(n)
 
 
         sig1 = (h1) * (1 - h1)
-        local_param1 = HandFunction2(np.sum(local_param2, axis=1), sig1, batch)
-        local_param1 = HandFunction1(np.sum(W2, axis=1), local_param1, batch)
-        result = HandFunction(input_data, local_param1, batch)
+        local_param1 = HandFunction2(np.sum(local_param2, axis=1), sig1)
+        local_param1 = HandFunction1(np.sum(W2, axis=1), local_param1)
+        result = HandFunction(input_data, local_param1)
         delta_h1 = (-learning_rate) * result
         #print("delta_h1:",delta_h1)
         NW1 = W1 + delta_h1

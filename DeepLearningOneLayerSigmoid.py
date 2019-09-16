@@ -2,7 +2,7 @@ import numpy as np
 from math import exp
 from DeepLearningFunction import *
 
-learning_rate = 0.001
+learning_rate = 0.0001
 
 
 def V_Sigmoid():
@@ -27,7 +27,7 @@ def ReLU(x):
 if __name__ == "__main__":
 
     batch = 100
-    epoch = 20
+    epoch = 10
     startNumber = 0
 
     data = np.loadtxt('TrainDataset.csv', delimiter=',', dtype=np.float32)
@@ -54,7 +54,8 @@ if __name__ == "__main__":
             train_y_data_onehot.append([0, 0, 0, 0, 0, 0, 1, 0])
         elif train_y_data[i] == 8:
             train_y_data_onehot.append([0, 0, 0, 0, 0, 0, 0, 1])
-    W = np.random.rand(4,8)
+    W1 = np.random.rand(4,24)
+    W2 = np.random.rand(24,8)
     #W1 = np.random.rand(4, 24)  # X = 3 / L1의 노드의 수 = 10
     #W2 = np.random.rand(24, 8)  # X = 3 / L1의 노드의 수 = 10
     # print(W1)
@@ -65,30 +66,57 @@ if __name__ == "__main__":
 
 
     def forward(x, y):
+        z1 = np.dot(x,W1)
+        #print("z1:",z1)
+        h1 = v_sigmoid(z1)
+        h1 = MakeFristOne(h1)
 
-        z1 = np.dot(x,W)
-        o = ODivideFunction(np.exp(z1), np.sum(np.exp(z1), axis=1))
-        e = np.mean(-np.sum(y * np.log(o), axis=1))
+        z2 = np.dot(h1,W2)
+        o = ODivideFunction(np.exp(z2), np.sum(np.exp(z2),axis=1))
+        e = np.mean(-np.sum(y*np.log(o),axis=1))
 
-        return e, o, z1
+        #o = v_sigmoid(z2)
+        #e = np.mean(np.square(y-o))/2
+
+        return e, o, h1
 
 
-    def backward(x, y, W, input_data):
-        local_param = (x-y)
-        result = HandFunction(input_data,local_param)
+    def backward(x, y, W1, W2, input_data,h1): # x = O(n) , y = label , W = Weight
+        local_param2 = (x - y)
+        result = HandFunction(h1, local_param2)
+        delta_o = (-learning_rate) * result
+        NW2 = W2 + delta_o
+
+        '''
+        sig2 = x*(1-x) # sigmoid' = O(n)[1-O(n)]
+        local_param2 = (y-x)*sig2 # 출력노드 국부적기울기
+        result = HandFunction(h1, local_param2)
         delta_o = (-learning_rate)*result
-        NW = W + delta_o
+        NW2 = W2 + delta_o
+        '''
+        sig1 = (h1) * (1 - h1)
 
-        return NW
+        local_param1 = HandFunction2(np.sum(local_param2, axis=1), sig1)
+        local_param1 = HandFunction1(np.sum(W2, axis=1), local_param1)
 
-    def Accuracy(x,y,batch):
-        z1 = np.dot(x,W)
-        o = ODivideFunction(np.exp(z1), np.sum(np.exp(z1), axis=1))
+        result = HandFunction(input_data, local_param1)
+        delta_h1 = (-learning_rate) * result
+        NW1 = W1 + delta_h1
+        return NW1, NW2
+
+    def Accuracy(x, y, batch):
+        z1 = np.dot(x,W1)
+        #print("z1:",z1)
+        h1 = v_sigmoid(z1)
+        h1 = MakeFristOne(h1)
+
+        z2 = np.dot(h1,W2)
+        o = ODivideFunction(np.exp(z2), np.sum(np.exp(z2),axis=1))
         accuracy = 0.
         for i in range(batch):
             if (np.argmax(o[i])==np.argmax(y[i])):
                 accuracy = accuracy + 1.
-        return accuracy/batch * 100
+        return accuracy/batch * 100, o
 
     maxBatch = int(len(train_x_data_bias) / batch)
     print("batch size   = ", batch)
@@ -101,8 +129,8 @@ if __name__ == "__main__":
             x_batch = train_x_data_bias[startNumber:startNumber + 100]
             y_batch = train_y_data_onehot[startNumber:startNumber + 100]
             if (len(x_batch) != 0):
-                Eav, error, z1 = forward(x_batch, y_batch)
-                W = backward(error, y_batch, W,x_batch)
+                Eav, error, h1 = forward(x_batch, y_batch)
+                W1,W2 = backward(error, y_batch, W1,W2,x_batch,h1 )
                 # print(W1)
                 Eavg = Eavg + Eav
                 startNumber = startNumber + 100
@@ -163,7 +191,10 @@ if __name__ == "__main__":
         x_batch = test_x_data_bias[startNumber:startNumber+batch]
         y_batch = test_y_data_onehot[startNumber:startNumber+batch]
         if(len(x_batch)!= 0):
-            accuracy = Accuracy(x_batch,y_batch,batch)
+            accuracy, pred = Accuracy(x_batch,y_batch,batch)
+            print("Label : ", np.argmax(y_batch, axis=1))
+            print("pred : ",np.argmax(pred,axis=1))
             Aavg = Aavg + accuracy
             startNumber = startNumber + 100
+        break
     print("Aavg : {}%".format((Aavg/len(test_x_data_bias))))
