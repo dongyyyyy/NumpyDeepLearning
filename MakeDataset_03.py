@@ -19,13 +19,13 @@ def createRandomArray():
         output = 6
     elif (result[0] == 1 and result[1] == 1 and result[2] == 1):
         output = 7
-    noise = np.random.normal(0, 0.1, 3)
+    noise = np.random.normal(0, 0.3, 3)
     result = result - noise
     return result , output
 
 if __name__ == "__main__":
     saveData = []
-    csvfile = open("TrainDataset.csv","w",newline="")
+    csvfile = open("TrainDataset_03.csv","w",newline="")
     csvwriter = csv.writer(csvfile)
 
     for i in range(20000):
@@ -36,7 +36,7 @@ if __name__ == "__main__":
 
     csvfile.close()
 
-    csvfile = open("TestDataset.csv", "w", newline="")
+    csvfile = open("TestDataset_03.csv", "w", newline="")
     csvwriter = csv.writer(csvfile)
 
     for i in range(1000):

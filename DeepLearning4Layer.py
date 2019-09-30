@@ -38,21 +38,21 @@ if __name__ == "__main__":
     train_y_data_onehot = []
     print("데이터 총 개수 : ", len(train_y_data))
     for i in range(len(train_y_data)):
-        if train_y_data[i] == 1:
+        if train_y_data[i] == 0:
             train_y_data_onehot.append([1, 0, 0, 0, 0, 0, 0, 0])
-        elif train_y_data[i] == 2:
+        elif train_y_data[i] == 1:
             train_y_data_onehot.append([0, 1, 0, 0, 0, 0, 0, 0])
-        elif train_y_data[i] == 3:
+        elif train_y_data[i] == 2:
             train_y_data_onehot.append([0, 0, 1, 0, 0, 0, 0, 0])
-        elif train_y_data[i] == 4:
+        elif train_y_data[i] == 3:
             train_y_data_onehot.append([0, 0, 0, 1, 0, 0, 0, 0])
-        elif train_y_data[i] == 5:
+        elif train_y_data[i] == 4:
             train_y_data_onehot.append([0, 0, 0, 0, 1, 0, 0, 0])
-        elif train_y_data[i] == 6:
+        elif train_y_data[i] == 5:
             train_y_data_onehot.append([0, 0, 0, 0, 0, 1, 0, 0])
-        elif train_y_data[i] == 7:
+        elif train_y_data[i] == 6:
             train_y_data_onehot.append([0, 0, 0, 0, 0, 0, 1, 0])
-        elif train_y_data[i] == 8:
+        elif train_y_data[i] == 7:
             train_y_data_onehot.append([0, 0, 0, 0, 0, 0, 0, 1])
 
     W1 = np.random.rand(4, 12)  # X = 3 / L1의 노드의 수 = 10

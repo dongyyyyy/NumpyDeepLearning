@@ -38,21 +38,21 @@ if __name__ == "__main__":
     train_y_data_onehot = []
     print("데이터 총 개수 : ", len(train_y_data))
     for i in range(len(train_y_data)):
-        if train_y_data[i] == 1:
+        if train_y_data[i] == 0:
             train_y_data_onehot.append([1, 0, 0, 0, 0, 0, 0, 0])
-        elif train_y_data[i] == 2:
+        elif train_y_data[i] == 1:
             train_y_data_onehot.append([0, 1, 0, 0, 0, 0, 0, 0])
-        elif train_y_data[i] == 3:
+        elif train_y_data[i] == 2:
             train_y_data_onehot.append([0, 0, 1, 0, 0, 0, 0, 0])
-        elif train_y_data[i] == 4:
+        elif train_y_data[i] == 3:
             train_y_data_onehot.append([0, 0, 0, 1, 0, 0, 0, 0])
-        elif train_y_data[i] == 5:
+        elif train_y_data[i] == 4:
             train_y_data_onehot.append([0, 0, 0, 0, 1, 0, 0, 0])
-        elif train_y_data[i] == 6:
+        elif train_y_data[i] == 5:
             train_y_data_onehot.append([0, 0, 0, 0, 0, 1, 0, 0])
-        elif train_y_data[i] == 7:
+        elif train_y_data[i] == 6:
             train_y_data_onehot.append([0, 0, 0, 0, 0, 0, 1, 0])
-        elif train_y_data[i] == 8:
+        elif train_y_data[i] == 7:
             train_y_data_onehot.append([0, 0, 0, 0, 0, 0, 0, 1])
     W = np.random.rand(4,8)
     #W1 = np.random.rand(4, 24)  # X = 3 / L1의 노드의 수 = 10
@@ -70,7 +70,7 @@ if __name__ == "__main__":
         o = ODivideFunction(np.exp(z1), np.sum(np.exp(z1), axis=1))
         e = np.mean(-np.sum(y * np.log(o), axis=1))
 
-        return e, o, z1
+        return e, o
 
 
     def backward(x, y, W, input_data):
@@ -100,9 +100,11 @@ if __name__ == "__main__":
         for j in range(maxBatch):  # 200번 반복
             x_batch = train_x_data_bias[startNumber:startNumber + 100]
             y_batch = train_y_data_onehot[startNumber:startNumber + 100]
+
             if (len(x_batch) != 0):
-                Eav, error, z1 = forward(x_batch, y_batch)
+                Eav, error = forward(x_batch, y_batch)
                 W = backward(error, y_batch, W,x_batch)
+
                 # print(W1)
                 Eavg = Eavg + Eav
                 startNumber = startNumber + 100
@@ -115,46 +117,7 @@ if __name__ == "__main__":
     test_y_data = data[:, [-1]]
     test_y_data_onehot = []
     for i in range(len(test_y_data)):
-        if test_y_data[i] == 1:
-            test_y_data_onehot.append([1, 0, 0, 0, 0, 0, 0, 0])
-        elif test_y_data[i] == 2:
-            test_y_data_onehot.append([0, 1, 0, 0, 0, 0, 0, 0])
-        elif test_y_data[i] == 3:
-            test_y_data_onehot.append([0, 0, 1, 0, 0, 0, 0, 0])
-        elif test_y_data[i] == 4:
-            test_y_data_onehot.append([0, 0, 0, 1, 0, 0, 0, 0])
-        elif test_y_data[i] == 5:
-            test_y_data_onehot.append([0, 0, 0, 0, 1, 0, 0, 0])
-        elif test_y_data[i] == 6:
-            test_y_data_onehot.append([0, 0, 0, 0, 0, 1, 0, 0])
-        elif test_y_data[i] == 7:
-            test_y_data_onehot.append([0, 0, 0, 0, 0, 0, 1, 0])
-        elif test_y_data[i] == 8:
-            test_y_data_onehot.append([0, 0, 0, 0, 0, 0, 0, 1])
-
-    test = np.loadtxt('TestDataset.csv', delimiter=',', dtype=np.float32)
-    test_x_data = data[:, 0:-1]
-    test_bias = [[1.] * 1 for i in range(len(test_x_data))]
-    test_x_data_bias = np.concatenate((test_bias, train_x_data), axis=1)
-    test_y_data = data[:, [-1]]
-    test_y_data_onehot = []
-    for i in range(len(test_y_data)):
-        if test_y_data[i] == 1:
-            test_y_data_onehot.append([1,0,0,0,0,0,0,0])
-        elif test_y_data[i] == 2:
-            test_y_data_onehot.append([0, 1, 0, 0, 0, 0, 0, 0])
-        elif test_y_data[i] == 3:
-            test_y_data_onehot.append([0, 0, 1, 0, 0, 0, 0, 0])
-        elif test_y_data[i] == 4:
-            test_y_data_onehot.append([0, 0, 0, 1, 0, 0, 0, 0])
-        elif test_y_data[i] == 5:
-            test_y_data_onehot.append([0, 0, 0, 0, 1, 0, 0, 0])
-        elif test_y_data[i] == 6:
-            test_y_data_onehot.append([0, 0, 0, 0, 0, 1, 0, 0])
-        elif test_y_data[i] == 7:
-            test_y_data_onehot.append([0, 0, 0, 0, 0, 0, 1, 0])
-        elif test_y_data[i] == 8:
-            test_y_data_onehot.append([0, 0, 0, 0, 0, 0, 0, 1])
+        test_y_data_onehot.append(RetrunOneHot(test_y_data[i]))
 
     Eavg = 0.
     startNumber = 0
